@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Custom Form with GPS</title>
+
+    <script>
+
+        // Function to detect if the device is mobile
+
+        function isMobileDevice() {
+
+            return /Mobi|Android/i.test(navigator.userAgent);
+
+        }
+
+ 
+
+        // Function to get GPS location
+
+        function getLocation() {
+
+            if (isMobileDevice()) {
+
+                if (navigator.geolocation) {
+
+                    navigator.geolocation.getCurrentPosition(showPosition);
+
+                } else {
+
+                    alert("Geolocation is not supported by this browser.");
+
+                }
+
+            } else {
+
+                alert("This form is only accessible on mobile devices.");
+
+                document.getElementById("submit-button").disabled = true; // Disable form submission on desktop
+
+            }
+
+        }
+
+ 
+
+        // Function to display GPS coordinates in form fields
+
+        function showPosition(position) {
+
+            document.getElementById("latitude").value = position.coords.latitude;
+
+            document.getElementById("longitude").value = position.coords.longitude;
+
+        }
+
+ 
+
+        // Function to submit the form data to Google Sheets
+
+        function submitForm() {
+
+            const data = {
+
+                name: document.getElementById("name").value,
+
+                latitude: document.getElementById("latitude").value,
+
+                longitude: document.getElementById("longitude").value
+
+            };
+
+ 
+
+            const url = "https://script.google.com/macros/s/AKfycbwmrziDhg5l-fzhXTpCGUEAPkD3VgLxnY9IBTnXepwYiZcZWD5rLaaULmeRGalqCzS-Vw/exec"; // Replace with your Google Apps Script URL
+
+ 
+
+            fetch(url, {
+
+                method: "POST",
+
+                mode: "no-cors", // This mode allows cross-origin requests without CORS headers
+
+                headers: {
+
+                    "Content-Type": "application/json"
+
+                },
+
+                body: JSON.stringify(data)
+
+            }).then(response => {
+
+                alert("Form submitted successfully!");
+
+            }).catch(error => {
+
+                console.error("Error submitting form:", error);
+
+            });
+
+        }
+
+ 
+
+        // Call getLocation() on page load
+
+        window.onload = getLocation;
+
+    </script>
+
+</head>
+
+<body>
+
+    <form onsubmit="event.preventDefault(); submitForm();">
+
+        <label for="name">Name:</label>
+
+        <input type="text" id="name" name="name" required><br><br>
+
+ 
+
+        <label for="latitude">Latitude:</label>
+
+        <input type="text" id="latitude" name="latitude" readonly><br><br>
+
+ 
+
+        <label for="longitude">Longitude:</label>
+
+        <input type="text" id="longitude" name="longitude" readonly><br><br>
+
+ 
+
+        <input type="submit" id="submit-button" value="Submit">
+
+    </form>
+
+</body>
+
+</html>
